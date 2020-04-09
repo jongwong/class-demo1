@@ -47,18 +47,7 @@ client
                         console.error("本地流发布失败 " + error);
                     })
                     .then(() => {
-                    debugger;
-                        console.log("本地流发布成功");
                         console.log(localStream);
-                        console.log("本地流发布成功");
-                    debugger;
-                        /*                var localVideoWrapEl = document.getElementById("local_video");
-
-                // 本地流播放
-                /!*              localStream.play(localVideoWrapEl, {
-                  muted: true,
-                });*!/*/
-
                         localStream.play("local_video");
                     });
             });
