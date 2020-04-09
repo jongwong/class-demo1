@@ -36,10 +36,10 @@ client
             .then(() => {
                 console.log("初始化本地流成功");
                 localStream.setVideoProfile({
-                    width: 360, // 视频宽度
-                    height: 360, // 视频高度
-                    frameRate: 10, // 帧率
-                    bitrate: 400, // 比特率 kbps
+                    width: 720, // 视频宽度
+                    height: 560, // 视频高度
+                    frameRate: 10, // 帧率  
+                    bitrate: 400, // 比特率 kbpsy
                 });
                 client
                     .publish(localStream)
