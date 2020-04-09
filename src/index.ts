@@ -8,43 +8,18 @@ const client = TRTC.createClient({
   userSig,
 });
 */
-debugger;
-var divvideo = document.querySelector("#video_wrap");
-console.log(divvideo);
+
 const roomId = "1234567890";
 const sdkAppId = "1400345310";
-const userId = "2";
-const userSig = "eJwtzMkKwjAUheF3yVrqbYZO4FLikC6qdqG4ERPjNVhCDSKI725pszzfgf9LDmqfvE1PKkITILNxozZdwBtOHPGl3cV71KRKOQDjgqUwPebjsTeDCyEoQNSAz9EKUZYgWBEraIcmnLJd3WCwOVe521qWSaeX67aRUtXt-XGe080RVHfFFSzI7w8bKS7D"
-
+const userId = "1";
+const userSig =
+    "eJyrVgrxCdYrSy1SslIy0jNQ0gHzM1NS80oy0zLBwoZQweKU7MSCgswUJStDEwMDYxNTY0MDiExqRUFmUSpQ3NTU1MjAACpakpkLFrMwtbQ0MDE1gpqSmQ40MyU9zCgi3yvDLzkv3bwwpCLSoyzJsMQvK8jNxNfXPze1KNwsy6jY1cey0MRWqRYAFy8vzw__";
 const client = TRTC.createClient({
-    mode: "videoCall",
+    mode: "live",
     sdkAppId,
     userId,
     userSig,
 });
-
-const remoteVideoWrapEl = document.getElementById("remote_video");
-client.on('stream-added', (event: any) => {
-    const remoteStream = event.stream;
-    console.log('远端流增加: ' + remoteStream.getId());
-
-    //订阅远端流
-    // client.subscribe(remoteStream);
-});
-client.on('stream-subscribed', (event: any) => {
-    debugger
-    const remoteStream = event.stream;
-    console.log('远端流订阅成功：' + remoteStream.getId());
-    remoteStream.play('remote-video-view');
-});
-// 监听‘stream-updated’事件
-client.on('stream-updated', (event: any) => {
-    const remoteStream = event.stream;
-    console.log('remoteStream ID: ' + remoteStream.getId() + ' was updated hasAudio: '
-        + remoteStream.hasAudio() + ' hasVideo: ' + remoteStream.hasVideo());
-});
-
-// @ts-ignore
 client
     .join({ roomId })
     .catch((error: any) => {
@@ -52,5 +27,39 @@ client
     })
     .then(() => {
         console.log("进房成功");
+        const localStream = TRTC.createStream({ userId, audio: true, video: true });
+        localStream
+            .initialize()
+            .catch((error: any) => {
+                console.error("初始化本地流失败 " + error);
+            })
+            .then(() => {
+                console.log("初始化本地流成功");
+                localStream.setVideoProfile({
+                    width: 360, // 视频宽度
+                    height: 360, // 视频高度
+                    frameRate: 10, // 帧率
+                    bitrate: 400, // 比特率 kbps
+                });
+                client
+                    .publish(localStream)
+                    .catch((error: any) => {
+                        console.error("本地流发布失败 " + error);
+                    })
+                    .then(() => {
+                    debugger;
+                        console.log("本地流发布成功");
+                        console.log(localStream);
+                        console.log("本地流发布成功");
+                    debugger;
+                        /*                var localVideoWrapEl = document.getElementById("local_video");
 
+                // 本地流播放
+                /!*              localStream.play(localVideoWrapEl, {
+                  muted: true,
+                });*!/*/
+
+                        localStream.play("local_video");
+                    });
+            });
     });
