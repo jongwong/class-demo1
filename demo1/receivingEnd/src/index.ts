@@ -30,7 +30,7 @@ client.on('stream-added', (event: any) => {
     console.log('远端流增加: ' + remoteStream.getId());
 
     //订阅远端流
-    // client.subscribe(remoteStream);
+     client.subscribe(remoteStream);
 });
 client.on('stream-subscribed', (event: any) => {
     debugger
