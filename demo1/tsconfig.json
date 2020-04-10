@@ -9,7 +9,9 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "demo1/src/*"
+      ]
     },
     "esModuleInterop": true
   }
