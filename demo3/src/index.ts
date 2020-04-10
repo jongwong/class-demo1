@@ -72,6 +72,12 @@ shareClient.join({ roomId }).then(() => {
   console.log("shareClient join success");
   // 创建屏幕分享流
   const localStream = TRTC.createStream({ audio: false, screen: true });
+/*  localStream.setVideoProfile({
+    width: 360, // 视频宽度
+    height: 360, // 视频高度
+    frameRate: 10, // 帧率
+    bitrate: 400, // 比特率 kbps
+  });*/
   localStream.initialize().then(() => {
     // screencast stream init success
     shareClient.publish(localStream).then(() => {
