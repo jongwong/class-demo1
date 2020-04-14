@@ -17,7 +17,9 @@
     ],
     "author": "JongWong",
     "dependencies": {
-        "trtc-js-sdk": "^4.3.11"
+        "trtc-js-sdk": "^4.3.11",
+        "cos-js-sdk-v5": "^0.5.26",
+        "tim-js-sdk": "^2.6.1"
     },
     "devDependencies": {
         "@types/jasmine": "^3.4.6",
