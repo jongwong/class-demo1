@@ -15,6 +15,13 @@ const userId = "1";
 const userSig =
   "eJyrVgrxCdYrSy1SslIy0jNQ0gHzM1NS80oy0zLBwoZQweKU7MSCgswUJStDEwMDYxNTY0MDiExqRUFmUSpQ3NTU1MjAACpakpkLFrMwtbQ0MDE1gpqSmQ40MyU9zCgi3yvDLzkv3bwwpCLSoyzJsMQvK8jNxNfXPze1KNwsy6jY1cey0MRWqRYAFy8vzw__";
 
+
+
+
+
+
+
+
 const client = TRTC.createClient({
   mode: "live",
   sdkAppId,
@@ -42,6 +49,28 @@ client
           frameRate: 10, // 帧率
           bitrate: 400, // 比特率 kbps
         });
+        console.log("----------------------");
+        console.log(localStream);
+        // @ts-ignore
+        window["toggleCamera"] = function () {
+          // @ts-ignore
+          let cameras = [];
+          TRTC.getCameras().then((devices: any) => {
+            cameras = devices;
+
+
+            // @ts-ignore
+            let cameraId = cameras[0].deviceId;
+            localStream.switchDevice('video', cameraId).then(() => {
+              console.log("===================================");
+              console.log(devices);
+              console.log(localStream);
+              console.log("===================================");
+              console.log('switch camera success');
+            });
+          });
+
+        };
         client
           .publish(localStream)
           .catch((error: any) => {
@@ -68,7 +97,6 @@ const shareClient = TRTC.createClient({
 
 shareClient.setDefaultMuteRemoteStreams(true);
 shareClient.join({ roomId }).then(() => {
-  debugger;
   console.log("shareClient join success");
   // 创建屏幕分享流
   const localStream = TRTC.createStream({ audio: false, screen: true });
@@ -78,10 +106,10 @@ shareClient.join({ roomId }).then(() => {
     frameRate: 10, // 帧率
     bitrate: 400, // 比特率 kbps
   });*/
+
   localStream.initialize().then(() => {
     // screencast stream init success
     shareClient.publish(localStream).then(() => {
-      debugger;
       console.log("screen casting");
     });
   });
@@ -99,3 +127,8 @@ client.on("stream-added", (event: any) => {
     client.subscribe(remoteStream);
   }
 });
+
+
+
+
+
