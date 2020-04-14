@@ -14,6 +14,8 @@ const sdkAppId = "1400345310";
 const userId = "1";
 const userSig =
     "eJyrVgrxCdYrSy1SslIy0jNQ0gHzM1NS80oy0zLBwoZQweKU7MSCgswUJStDEwMDYxNTY0MDiExqRUFmUSpQ3NTU1MjAACpakpkLFrMwtbQ0MDE1gpqSmQ40MyU9zCgi3yvDLzkv3bwwpCLSoyzJsMQvK8jNxNfXPze1KNwsy6jY1cey0MRWqRYAFy8vzw__";
+
+
 const client = TRTC.createClient({
     mode: "live",
     sdkAppId,
