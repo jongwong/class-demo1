@@ -1,9 +1,13 @@
 // @ts-ignore
 import TRTC from "trtc-js-sdk";
-// @ts-ignore
-import TIM from 'tim-js-sdk';
-// @ts-ignore
-import COS from "cos-js-sdk-v5";
+/*
+const client = TRTC.createClient({
+  mode: "videoCall",
+  sdkAppId,
+  userId,
+  userSig,
+});
+*/
 
 const roomId = "1234567890";
 const sdkAppId = "1400345310";
@@ -11,50 +15,120 @@ const userId = "1";
 const userSig =
   "eJyrVgrxCdYrSy1SslIy0jNQ0gHzM1NS80oy0zLBwoZQweKU7MSCgswUJStDEwMDYxNTY0MDiExqRUFmUSpQ3NTU1MjAACpakpkLFrMwtbQ0MDE1gpqSmQ40MyU9zCgi3yvDLzkv3bwwpCLSoyzJsMQvK8jNxNfXPze1KNwsy6jY1cey0MRWqRYAFy8vzw__";
 
-var initParams = {
-  id: "local_video", // dom节点id
-  classId: roomId, // 整数
-  sdkAppId: sdkAppId, // 整数
-  userId: userId, // 字符串
-  userSig: userSig, // 字符串
-};
-// @ts-ignore
-var teduBoard = new window["TEduBoard"](initParams);
-let options = {
-  SDKAppID: sdkAppId
-};
-
-let tim = TIM.create(options); // SDK 实例通常用 tim 表示
 
 
-tim.setLogLevel(0); // 普通级别，日志量较多，接入时建议使用
-// 注册 COS SDK 插件
-tim.registerPlugin({'cos-js-sdk': COS});
-let promise = tim.login({userID: userId, userSig: userSig});
-promise.then((imResponse: any) => {
-  console.log(imResponse.data); // 登录成功
-  console.log("tim 登录成功");
-}).catch((imError: any) => {
-  console.warn('login error:', imError); // 登录失败的相关信息
+
+
+
+
+
+const client = TRTC.createClient({
+  mode: "live",
+  sdkAppId,
+  userId,
+  userSig,
+});
+client
+  .join({ roomId })
+  .catch((error: any) => {
+    console.error("进房失败 " + error);
+  })
+  .then(() => {
+    console.log("进房成功");
+    const localStream = TRTC.createStream({ userId, audio: true, video: true });
+    localStream
+      .initialize()
+      .catch((error: any) => {
+        console.error("初始化本地流失败 " + error);
+      })
+      .then(() => {
+        console.log("初始化本地流成功");
+        localStream.setVideoProfile({
+          width: 360, // 视频宽度
+          height: 360, // 视频高度
+          frameRate: 10, // 帧率
+          bitrate: 400, // 比特率 kbps
+        });
+        console.log("----------------------");
+        console.log(localStream);
+        // @ts-ignore
+        window["toggleCamera"] = function () {
+          // @ts-ignore
+          let cameras = [];
+          TRTC.getCameras().then((devices: any) => {
+            cameras = devices;
+
+
+            // @ts-ignore
+            let cameraId = cameras[0].deviceId;
+            localStream.switchDevice('video', cameraId).then(() => {
+              console.log("===================================");
+              console.log(devices);
+              console.log(localStream);
+              console.log("===================================");
+              console.log('switch camera success');
+            });
+          });
+
+        };
+        client
+          .publish(localStream)
+          .catch((error: any) => {
+            console.error("本地流发布失败 " + error);
+          })
+          .then(() => {
+            localStream.play("local_video");
+          });
+      });
+  });
+
+const shareUserId = "6";
+const shareUserSig =
+  "eJwtzMsKwjAURdF-yVQpN0kTY6EDdSIitGAR7EzIw4uv0AQtiP9uiRmedWB-SLc-FC8zkIqwAsg8bdTmEdFiYpkx6OvZe9SkoiUALwWn8H-M6HEwkwshGEDWiPdkSnLOKWW5gm5qerlolH3vZtJdcITV8rlu401tQ*t1t7G9OwGE0B9Do2ry-QH*UC9q";
+
+const shareClient = TRTC.createClient({
+  mode: "live",
+  sdkAppId,
+  userId: shareUserId,
+  userSig: shareUserSig,
 });
 
-// @ts-ignore
-const TEduBoard = window["TEduBoard"];
+// 指明该 shareClient 默认不接收任何远端流 （它只负责发送屏幕分享流）
 
-teduBoard.on(TEduBoard.EVENT.TEB_SYNCDATA, (data:any) => {
-  let message = tim.createCustomMessage({
-    to: '课堂号',
-    conversationType: TIM.TYPES.CONV_GROUP,
-    payload: {
-      data: JSON.stringify(data),
-      description: '',
-      extension: 'TXWhiteBoardExt'
-    }
-  });
-  tim.sendMessage(message).then(() => {
-    // 同步成功
-  }, () => {
-    // 同步失败
+shareClient.setDefaultMuteRemoteStreams(true);
+shareClient.join({ roomId }).then(() => {
+  console.log("shareClient join success");
+  // 创建屏幕分享流
+  const localStream = TRTC.createStream({ audio: false, screen: true });
+/*  localStream.setVideoProfile({
+    width: 360, // 视频宽度
+    height: 360, // 视频高度
+    frameRate: 10, // 帧率
+    bitrate: 400, // 比特率 kbps
+  });*/
+
+  localStream.initialize().then(() => {
+    // screencast stream init success
+    shareClient.publish(localStream).then(() => {
+      console.log("screen casting");
+    });
   });
 });
+
+// 主 Client 中指定取消订阅 shareId 的远端流
+client.on("stream-added", (event: any) => {
+  const remoteStream = event.stream;
+  const remoteUserId = remoteStream.getUserId();
+  if (remoteUserId === shareUserId) {
+    // 取消订阅自己的屏幕分享流
+    client.unsubscribe(remoteStream);
+  } else {
+    // 订阅其他一般远端流
+    client.subscribe(remoteStream);
+  }
+});
+
+
+
+
 
