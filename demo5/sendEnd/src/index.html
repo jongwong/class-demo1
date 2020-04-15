@@ -7,6 +7,8 @@
 
     <!-- axios SDK -->
     <script src="https://resources-tiw.qcloudtrtc.com/board/third/axios/axios.min.js"></script>
+
+
     <!-- TEduBoard SDK -->
     <script src="https://resources-tiw.qcloudtrtc.com/board/2.4.6/TEduBoard.min.js"></script>
 </head>
@@ -14,7 +16,26 @@
 <body>
     <div id="container"></div>
     <div id="local_video" style="height: 400px; width: 560px"></div>
-    <style>
+
+
+    <div>
+        <label>上传</label>
+        <input id="file_input" type="file" onchange="uploadFile()"
+               accept="image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/vnd.ms-powerpoint, application/vnd.ms-excel">
+
+    </div>
+
+
+    <div>
+        <label onclick="clearFiles()">清楚所有文件</label>
+    </div>
+    <div>
+        <label onclick="clearCurrentFile()">清楚当前文件</label>
+    </div>
+    <div>
+        <label onclick="switchFile()">切换文件</label>
+    </div>
+       <style>
     </style>
 </body>
 
